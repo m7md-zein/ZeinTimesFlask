@@ -1,1 +1,179 @@
-{% extends "base.html" %}{% block content %}<h1>قريباً</h1>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Zein Times — إنشاء عدد{% endblock %}
+
+{% block content %}
+<div style="max-width:800px;margin:0 auto;padding:40px 32px;">
+
+    <h1 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;letter-spacing:2px;border-bottom:2px solid rgba(0,0,0,0.85);padding-bottom:16px;margin-bottom:32px;">
+        إنشاء عدد جديد
+    </h1>
+
+    <form method="POST" action="{{ url_for('issue_create') }}" enctype="multipart/form-data" id="issue-form">
+
+        <!-- STEP INDICATOR -->
+        <div style="display:flex;gap:0;margin-bottom:32px;border:1px solid rgba(0,0,0,0.1);border-radius:3px;overflow:hidden;">
+            {% for step_name in ['المعلومات الأساسية','الفقرات','المحتوى','الستايل'] %}
+            <div class="step-indicator" id="step-tab-{{ loop.index }}"
+                style="flex:1;padding:10px;text-align:center;font-size:12px;letter-spacing:1px;
+                       background:{% if loop.index == 1 %}rgba(0,0,0,0.85){% else %}transparent{% endif %};
+                       color:{% if loop.index == 1 %}white{% else %}rgba(0,0,0,0.4){% endif %};
+                       border-left:{% if loop.index > 1 %}1px solid rgba(0,0,0,0.1){% else %}none{% endif %};">
+                {{ loop.index }}. {{ step_name }}
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- STEP 1: BASIC INFO -->
+        <div class="step" id="step-1">
+            <div class="zt-form-group">
+                <label class="zt-form-label">اسم العدد</label>
+                <input type="text" name="title" class="zt-form-input" required>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                <div class="zt-form-group">
+                    <label class="zt-form-label">رقم العدد</label>
+                    <input type="number" name="issue_number" class="zt-form-input" value="{{ next_issue_number }}" min="1" required>
+                </div>
+                <div class="zt-form-group">
+                    <label class="zt-form-label">تاريخ الإصدار</label>
+                    <input type="date" name="publish_date" class="zt-form-input" required>
+                </div>
+            </div>
+            <div class="zt-form-group">
+                <label class="zt-form-label">عدد الفقرات</label>
+                <input type="number" name="sections_count" id="sections-count" class="zt-form-input" value="3" min="1" max="10">
+            </div>
+            <button type="button" onclick="goToStep(2)" class="zt-form-submit">التالي ←</button>
+        </div>
+
+        <!-- STEP 2: SECTION TITLES -->
+        <div class="step" id="step-2" style="display:none;">
+            <p style="font-size:14px;color:rgba(0,0,0,0.5);margin-bottom:20px;">أدخل عناوين الفقرات</p>
+            <div id="section-titles-container"></div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+                <button type="button" onclick="goToStep(1)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
+                <button type="button" onclick="goToStep(3)" class="zt-btn-solid" style="flex:1;padding:12px;">التالي ←</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: CONTENT -->
+        <div class="step" id="step-3" style="display:none;">
+            <div id="sections-content-container"></div>
+            <div style="display:flex;gap:12px;margin-top:24px;">
+                <button type="button" onclick="goToStep(2)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
+                <button type="button" onclick="goToStep(4)" class="zt-btn-solid" style="flex:1;padding:12px;">التالي ←</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: STYLE -->
+        <div class="step" id="step-4" style="display:none;">
+            <p style="font-size:14px;color:rgba(0,0,0,0.5);margin-bottom:24px;">اختر تصميم جريدتك</p>
+            <input type="hidden" name="style" id="selected-style" value="">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
+                {% for style in [
+                    ('كلاسيكي','#2c1810','#f5f0e8','Georgia'),
+                    ('علمي','#1a3a5c','#f0f4f8','Arial'),
+                    ('عصور وسطى','#3d1f00','#f4e8c1','Palatino'),
+                    ('نمط الحياة','#e91e8c','#fff0f5','Trebuchet MS'),
+                    ('رياضي','#1a1a1a','#f0f0f0','Impact')
+                ] %}
+                <div onclick="selectStyle('{{ style[0] }}', this)"
+                    style="border:2px solid rgba(0,0,0,0.1);border-radius:4px;overflow:hidden;cursor:pointer;transition:all 0.15s;"
+                    class="style-card">
+                    <div style="background:{{ style[1] }};color:{{ style[2] }};padding:20px;text-align:center;font-family:'{{ style[3] }}',serif;">
+                        <div style="font-size:16px;font-weight:bold;letter-spacing:2px;">ZEIN TIMES</div>
+                        <div style="font-size:11px;margin-top:4px;opacity:0.7;">{{ style[0] }}</div>
+                    </div>
+                    <div style="padding:10px;text-align:center;font-size:12px;color:rgba(0,0,0,0.6);">{{ style[0] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div id="style-selected-msg" style="display:none;padding:10px;background:#d8f3dc;color:#2d6a4f;border-radius:3px;margin-bottom:16px;font-size:14px;"></div>
+            <div style="display:flex;gap:12px;">
+                <button type="button" onclick="goToStep(3)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
+                <button type="submit" class="zt-form-submit" style="flex:2;padding:12px;">توليد الجريدة</button>
+            </div>
+        </div>
+
+    </form>
+</div>
+
+<script>
+let currentStep = 1;
+
+function updateStepIndicators(step) {
+    for (let i = 1; i <= 4; i++) {
+        const tab = document.getElementById(`step-tab-${i}`);
+        if (i === step) {
+            tab.style.background = 'rgba(0,0,0,0.85)';
+            tab.style.color = 'white';
+        } else {
+            tab.style.background = 'transparent';
+            tab.style.color = 'rgba(0,0,0,0.4)';
+        }
+    }
+}
+
+function goToStep(step) {
+    document.querySelectorAll('.step').forEach(s => s.style.display = 'none');
+    if (step === 2) buildSectionTitles();
+    if (step === 3) buildSectionContent();
+    document.getElementById(`step-${step}`).style.display = 'block';
+    updateStepIndicators(step);
+    currentStep = step;
+    window.scrollTo(0, 0);
+}
+
+function buildSectionTitles() {
+    const count = parseInt(document.getElementById('sections-count').value) || 3;
+    const container = document.getElementById('section-titles-container');
+    const existing = container.querySelectorAll('input');
+    const existingVals = Array.from(existing).map(i => i.value);
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        const val = existingVals[i] || `فقرة ${i + 1}`;
+        container.innerHTML += `
+            <div class="zt-form-group">
+                <label class="zt-form-label">عنوان الفقرة ${i + 1}</label>
+                <input type="text" name="section_title_${i}" class="zt-form-input" value="${val}" required>
+            </div>`;
+    }
+}
+
+function buildSectionContent() {
+    const count = parseInt(document.getElementById('sections-count').value) || 3;
+    const titles = [];
+    for (let i = 0; i < count; i++) {
+        const t = document.querySelector(`[name="section_title_${i}"]`);
+        titles.push(t ? t.value : `فقرة ${i + 1}`);
+    }
+    const container = document.getElementById('sections-content-container');
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+        container.innerHTML += `
+            <div style="border:1px solid rgba(0,0,0,0.1);border-radius:4px;padding:20px;margin-bottom:16px;">
+                <h3 style="font-family:'Playfair Display',serif;font-size:17px;margin-bottom:16px;color:rgba(0,0,0,0.85);">${titles[i]}</h3>
+                <div class="zt-form-group">
+                    <label class="zt-form-label">النص</label>
+                    <textarea name="section_text_${i}" class="zt-form-textarea" rows="5"></textarea>
+                </div>
+                <div class="zt-form-group">
+                    <label class="zt-form-label">صورة (اختياري)</label>
+                    <input type="file" name="section_image_${i}" accept="image/*" style="font-family:'EB Garamond',serif;font-size:14px;">
+                </div>
+            </div>`;
+    }
+}
+
+function selectStyle(name, el) {
+    document.querySelectorAll('.style-card').forEach(c => {
+        c.style.border = '2px solid rgba(0,0,0,0.1)';
+    });
+    el.style.border = '2px solid rgba(0,0,0,0.85)';
+    document.getElementById('selected-style').value = name;
+    const msg = document.getElementById('style-selected-msg');
+    msg.style.display = 'block';
+    msg.textContent = `✅ الستايل المختار: ${name}`;
+}
+</script>
+{% endblock %}
