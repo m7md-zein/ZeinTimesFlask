@@ -82,6 +82,15 @@ def get_newspaper_by_id(newspaper_id):
     conn.close()
     return result
 
+def get_newspaper_by_username(username):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM newspapers WHERE username = %s", (username,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result
+
 def get_followers_count(newspaper_id):
     conn = get_connection()
     cursor = conn.cursor()
@@ -99,6 +108,32 @@ def get_following_count(newspaper_id):
     cursor.close()
     conn.close()
     return count
+
+def is_following(follower_id, following_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id FROM follows WHERE follower_id = %s AND following_id = %s",
+                   (follower_id, following_id))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result is not None
+
+def get_newspaper_issues(newspaper_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT i.*, COUNT(l.id) as likes_count
+        FROM issues i
+        LEFT JOIN likes l ON l.issue_id = i.id
+        WHERE i.newspaper_id = %s AND i.status = 'published'
+        GROUP BY i.id
+        ORDER BY i.created_at DESC
+    """, (newspaper_id,))
+    result = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return result
 
 @app.route("/")
 def landing():
@@ -268,9 +303,64 @@ def issue_delete(issue_id):
     flash("تم حذف العدد.")
     return redirect(url_for("dashboard"))
 
+@app.route("/issue/<int:issue_id>/download/<fmt>")
+def issue_download(issue_id, fmt):
+    return "قريباً", 200
+
 @app.route("/newspaper/<username>")
 def newspaper_view(username):
-    return render_template("newspaper.html")
+    newspaper = get_newspaper_by_username(username)
+    if not newspaper:
+        flash("الجريدة غير موجودة.")
+        return redirect(url_for("home"))
+    issues = get_newspaper_issues(newspaper["id"])
+    followers_count = get_followers_count(newspaper["id"])
+    following = False
+    if session.get("newspaper_id"):
+        following = is_following(session["newspaper_id"], newspaper["id"])
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE newspapers SET visitor_count = visitor_count + 1 WHERE id = %s",
+                       (newspaper["id"],))
+        conn.commit()
+        cursor.close()
+        conn.close()
+    return render_template("newspaper.html",
+        newspaper=newspaper,
+        issues=issues,
+        followers_count=followers_count,
+        is_following=following
+    )
+
+@app.route("/newspaper/<int:newspaper_id>/follow", methods=["POST"])
+def follow(newspaper_id):
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT IGNORE INTO follows (follower_id, following_id) VALUES (%s, %s)",
+                       (session["newspaper_id"], newspaper_id))
+        conn.commit()
+    except:
+        pass
+    finally:
+        cursor.close()
+        conn.close()
+    return redirect(request.referrer or url_for("home"))
+
+@app.route("/newspaper/<int:newspaper_id>/unfollow", methods=["POST"])
+def unfollow(newspaper_id):
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM follows WHERE follower_id = %s AND following_id = %s",
+                   (session["newspaper_id"], newspaper_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(request.referrer or url_for("home"))
 
 if __name__ == "__main__":
     app.run(debug=True)
