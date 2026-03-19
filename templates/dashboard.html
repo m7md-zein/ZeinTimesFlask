@@ -1,1 +1,109 @@
-{% extends "base.html" %}{% block content %}<h1>قريباً</h1>{% endblock %}
+{% extends "base.html" %}
+{% block title %}Zein Times — جريدتي{% endblock %}
+
+{% block content %}
+<div style="max-width:1200px;margin:0 auto;padding:40px 32px;">
+
+    <!-- NEWSPAPER HEADER -->
+    <div style="border-bottom:2px solid rgba(0,0,0,0.85);padding-bottom:24px;margin-bottom:32px;display:flex;align-items:flex-start;justify-content:space-between;">
+        <div>
+            <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:700;letter-spacing:3px;color:rgba(0,0,0,0.85);">{{ newspaper.name }}</h1>
+            <p style="font-size:13px;color:rgba(0,0,0,0.45);letter-spacing:2px;margin-top:4px;">@{{ newspaper.username }} — {{ newspaper.category }} — {{ newspaper.frequency }}</p>
+            {% if newspaper.description %}
+            <p style="font-size:15px;color:rgba(0,0,0,0.6);margin-top:12px;max-width:600px;line-height:1.6;">{{ newspaper.description }}</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('issue_create') }}" class="zt-btn-solid" style="font-size:14px;padding:10px 24px;white-space:nowrap;">+ إضافة عدد جديد</a>
+    </div>
+
+    <!-- STATS ROW -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:40px;">
+        <div style="background:rgba(0,0,0,0.04);border-radius:4px;padding:20px;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:rgba(0,0,0,0.85);">{{ issues|length }}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(0,0,0,0.45);text-transform:uppercase;margin-top:4px;">عدد الأعداد</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.04);border-radius:4px;padding:20px;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:rgba(0,0,0,0.85);">{{ newspaper.visitor_count }}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(0,0,0,0.45);text-transform:uppercase;margin-top:4px;">الزوار</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.04);border-radius:4px;padding:20px;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:rgba(0,0,0,0.85);">{{ followers_count }}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(0,0,0,0.45);text-transform:uppercase;margin-top:4px;">المتابعون</div>
+        </div>
+        <div style="background:rgba(0,0,0,0.04);border-radius:4px;padding:20px;text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:rgba(0,0,0,0.85);">{{ following_count }}</div>
+            <div style="font-size:11px;letter-spacing:2px;color:rgba(0,0,0,0.45);text-transform:uppercase;margin-top:4px;">المتابَعون</div>
+        </div>
+    </div>
+
+    <!-- ISSUES LIST -->
+    <div style="border-bottom:2px solid rgba(0,0,0,0.85);padding-bottom:12px;margin-bottom:24px;">
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:2px;">أعدادي</h2>
+    </div>
+
+    {% if issues %}
+    <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for issue in issues %}
+        <div style="border:1px solid rgba(0,0,0,0.1);border-radius:4px;padding:20px;display:flex;align-items:center;justify-content:space-between;transition:border-color 0.15s;" onmouseover="this.style.borderColor='rgba(0,0,0,0.75)'" onmouseout="this.style.borderColor='rgba(0,0,0,0.1)'">
+            <div style="flex:1;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
+                    <span style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:rgba(0,0,0,0.85);">{{ issue.title }}</span>
+                    {% if issue.status == 'published' %}
+                        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;background:#d8f3dc;color:#2d6a4f;padding:2px 10px;border-radius:2px;">منشور</span>
+                    {% else %}
+                        <span style="font-size:10px;letter-spacing:2px;text-transform:uppercase;background:#fff3cd;color:#856404;padding:2px 10px;border-radius:2px;">مسودة</span>
+                    {% endif %}
+                </div>
+                <div style="font-size:12px;color:rgba(0,0,0,0.45);letter-spacing:1px;">
+                    العدد {{ issue.issue_number }} — {{ issue.publish_date }} — {{ issue.style }}
+                    &nbsp;|&nbsp; ♥ {{ issue.likes_count }} لايك
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-right:20px;">
+                <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-btn-outline" style="font-size:12px;padding:6px 14px;">فتح</a>
+                <a href="{{ url_for('issue_edit', issue_id=issue.id) }}" class="zt-btn-outline" style="font-size:12px;padding:6px 14px;">تعديل</a>
+                <form method="POST" action="{{ url_for('issue_delete', issue_id=issue.id) }}" style="display:inline;" onsubmit="return confirm('هل أنت متأكد؟')">
+                    <button type="submit" class="zt-btn-outline" style="font-size:12px;padding:6px 14px;color:#9b2226;border-color:rgba(155,34,38,0.3);">حذف</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:60px;border:1px dashed rgba(0,0,0,0.15);border-radius:4px;">
+        <p style="font-size:16px;color:rgba(0,0,0,0.4);margin-bottom:20px;">لم تنشر أي أعداد بعد.</p>
+        <a href="{{ url_for('issue_create') }}" class="zt-btn-solid">أضف عدد جديد</a>
+    </div>
+    {% endif %}
+
+    <!-- SETTINGS -->
+    <div style="border-bottom:2px solid rgba(0,0,0,0.85);padding-bottom:12px;margin:48px 0 24px;">
+        <h2 style="font-family:'Playfair Display',serif;font-size:22px;font-weight:700;letter-spacing:2px;">إعدادات الجريدة</h2>
+    </div>
+    <form method="POST" action="{{ url_for('dashboard_update') }}" style="max-width:600px;">
+        <div class="zt-form-group">
+            <label class="zt-form-label">وصف الجريدة</label>
+            <textarea name="description" class="zt-form-textarea">{{ newspaper.description or '' }}</textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="zt-form-group">
+                <label class="zt-form-label">النوع</label>
+                <select name="category" class="zt-form-select">
+                    {% for cat in ['علمية','أدبية','رياضية','نمط الحياة','أخرى'] %}
+                        <option value="{{ cat }}" {% if newspaper.category == cat %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="zt-form-group">
+                <label class="zt-form-label">التكرار</label>
+                <select name="frequency" class="zt-form-select">
+                    {% for freq in ['يومية','أسبوعية','شهرية'] %}
+                        <option value="{{ freq }}" {% if newspaper.frequency == freq %}selected{% endif %}>{{ freq }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="zt-form-submit" style="max-width:200px;">حفظ التغييرات</button>
+    </form>
+</div>
+{% endblock %}

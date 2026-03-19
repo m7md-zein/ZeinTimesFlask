@@ -64,7 +64,7 @@ def get_my_issues(newspaper_id):
         SELECT i.*, COUNT(l.id) as likes_count
         FROM issues i
         LEFT JOIN likes l ON l.issue_id = i.id
-        WHERE i.newspaper_id = %s AND i.status = 'published'
+        WHERE i.newspaper_id = %s
         GROUP BY i.id
         ORDER BY i.created_at DESC
     """, (newspaper_id,))
@@ -72,6 +72,33 @@ def get_my_issues(newspaper_id):
     cursor.close()
     conn.close()
     return result
+
+def get_newspaper_by_id(newspaper_id):
+    conn = get_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM newspapers WHERE id = %s", (newspaper_id,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return result
+
+def get_followers_count(newspaper_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM follows WHERE following_id = %s", (newspaper_id,))
+    count = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
+    return count
+
+def get_following_count(newspaper_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM follows WHERE follower_id = %s", (newspaper_id,))
+    count = cursor.fetchone()[0]
+    cursor.close()
+    conn.close()
+    return count
 
 @app.route("/")
 def landing():
@@ -175,25 +202,75 @@ def check_username():
     conn.close()
     return jsonify({"available": not exists})
 
-@app.route("/newspaper/<username>")
-def newspaper_view(username):
-    return render_template("newspaper.html")
+@app.route("/dashboard")
+def dashboard():
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    newspaper_id = session["newspaper_id"]
+    newspaper = get_newspaper_by_id(newspaper_id)
+    issues = get_my_issues(newspaper_id)
+    followers_count = get_followers_count(newspaper_id)
+    following_count = get_following_count(newspaper_id)
+    return render_template("dashboard.html",
+        newspaper=newspaper,
+        issues=issues,
+        followers_count=followers_count,
+        following_count=following_count
+    )
+
+@app.route("/dashboard/update", methods=["POST"])
+def dashboard_update():
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    description = request.form.get("description")
+    category = request.form.get("category")
+    frequency = request.form.get("frequency")
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE newspapers SET description=%s, category=%s, frequency=%s WHERE id=%s
+    """, (description, category, frequency, session["newspaper_id"]))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash("تم حفظ التغييرات!")
+    return redirect(url_for("dashboard"))
+
+@app.route("/issue/create", methods=["GET", "POST"])
+def issue_create():
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    return render_template("issue_builder.html")
 
 @app.route("/issue/<int:issue_id>")
 def issue_view(issue_id):
     return render_template("issue.html")
 
-@app.route("/dashboard")
-def dashboard():
-    if "newspaper_id" not in session:
-        return redirect(url_for("login"))
-    return render_template("dashboard.html")
-
-@app.route("/issue/create")
-def issue_create():
+@app.route("/issue/<int:issue_id>/edit")
+def issue_edit(issue_id):
     if "newspaper_id" not in session:
         return redirect(url_for("login"))
     return render_template("issue_builder.html")
+
+@app.route("/issue/<int:issue_id>/delete", methods=["POST"])
+def issue_delete(issue_id):
+    if "newspaper_id" not in session:
+        return redirect(url_for("login"))
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM sections WHERE issue_id = %s", (issue_id,))
+    cursor.execute("DELETE FROM likes WHERE issue_id = %s", (issue_id,))
+    cursor.execute("DELETE FROM issues WHERE id = %s AND newspaper_id = %s",
+                   (issue_id, session["newspaper_id"]))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    flash("تم حذف العدد.")
+    return redirect(url_for("dashboard"))
+
+@app.route("/newspaper/<username>")
+def newspaper_view(username):
+    return render_template("newspaper.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
