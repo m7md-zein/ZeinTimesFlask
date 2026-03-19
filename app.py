@@ -406,7 +406,22 @@ def issue_delete(issue_id):
 
 @app.route("/issue/<int:issue_id>/download/<fmt>")
 def issue_download(issue_id, fmt):
-    return "قريباً", 200
+    from export import export_word, export_pdf
+    issue, sections = get_issue_data(issue_id)
+    if not issue:
+        flash("العدد غير موجود.")
+        return redirect(url_for("home"))
+    if fmt == "word":
+        path = export_word(issue, sections)
+        return send_file(path, as_attachment=True,
+                         download_name=f"{issue['title']}.docx",
+                         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    elif fmt == "pdf":
+        path = export_pdf(issue, sections)
+        return send_file(path, as_attachment=True,
+                         download_name=f"{issue['title']}.pdf",
+                         mimetype="application/pdf")
+    return "صيغة غير مدعومة", 400
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
