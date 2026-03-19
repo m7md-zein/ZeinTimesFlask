@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Zein Times — تسجيل الدخول{% endblock %}
+
+{% block content %}
+<div class="zt-auth-page">
+    <h1 class="zt-auth-title">تسجيل الدخول</h1>
+    <p class="zt-auth-sub">أدخل بيانات جريدتك للدخول</p>
+
+    <form method="POST">
+        <div class="zt-form-group">
+            <label class="zt-form-label">اسم المستخدم</label>
+            <input type="text" name="username" class="zt-form-input" required autocomplete="username">
+        </div>
+        <div class="zt-form-group">
+            <label class="zt-form-label">كلمة المرور</label>
+            <input type="password" name="password" class="zt-form-input" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="zt-form-submit">دخول</button>
+    </form>
+
+    <div class="zt-auth-switch">
+        ما عندكش جريدة؟ <a href="{{ url_for('register') }}">أنشئ جريدة جديدة</a>
+    </div>
+</div>
+{% endblock %}

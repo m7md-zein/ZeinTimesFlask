@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Zein Times — الرئيسية{% endblock %}
+
+{% block content %}
+
+<!-- QUOTE SECTION -->
+<div class="zt-quote-section">
+    <div class="zt-quote-text">"{{ quote.text_ar }}"</div>
+    <div class="zt-quote-author">— {{ quote.author }}</div>
+</div>
+
+<!-- POPULAR NEWSPAPERS -->
+<section class="zt-section">
+    <div class="zt-section-header">
+        <h2 class="zt-section-title">أشهر الجرائد</h2>
+        <span class="zt-section-label">Newspapers</span>
+    </div>
+    <div class="zt-cards-grid">
+        {% for paper in newspapers %}
+        <a href="{{ url_for('newspaper_view', username=paper.username) }}" class="zt-card">
+            <div class="zt-card-img">
+                {% if paper.cover_image %}
+                    <img src="{{ paper.cover_image }}" alt="{{ paper.name }}">
+                {% else %}
+                    ZEIN TIMES
+                {% endif %}
+            </div>
+            <div class="zt-card-body">
+                <div class="zt-card-badge">{{ paper.category }}</div>
+                <div class="zt-card-title">{{ paper.name }}</div>
+                <div class="zt-card-meta">
+                    <span>@{{ paper.username }}</span>
+                    <span class="zt-stars">
+                        {% for i in range(5) %}
+                            {% if i < paper.rating|int %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="color:rgba(0,0,0,0.4);font-size:14px;">لا توجد جرائد بعد.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<div class="zt-divider-ornament"><hr><span>✦</span><hr></div>
+
+<!-- ISSUES SECTION -->
+<section class="zt-section">
+    <div class="zt-section-header">
+        <h2 class="zt-section-title">الأعداد</h2>
+        <div class="zt-filter-tabs">
+            <button class="zt-filter-tab active" onclick="filterIssues('latest', this)">الأحدث</button>
+            <button class="zt-filter-tab" onclick="filterIssues('popular', this)">الأشهر</button>
+        </div>
+    </div>
+    <div class="zt-cards-grid" id="issues-grid">
+        {% for issue in issues %}
+        <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-card">
+            <div class="zt-card-img">
+                {% if issue.cover_image %}
+                    <img src="{{ issue.cover_image }}" alt="{{ issue.title }}">
+                {% else %}
+                    ZEIN TIMES
+                {% endif %}
+            </div>
+            <div class="zt-card-body">
+                <div class="zt-card-badge">{{ issue.newspaper_name }}</div>
+                <div class="zt-card-title">{{ issue.title }}</div>
+                <div class="zt-card-meta">
+                    <span>{{ issue.publish_date }}</span>
+                    <span class="zt-stars">
+                        {% for i in range(5) %}
+                            {% if i < issue.rating|int %}★{% else %}☆{% endif %}
+                        {% endfor %}
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <p style="color:rgba(0,0,0,0.4);font-size:14px;">لا توجد أعداد بعد.</p>
+        {% endfor %}
+    </div>
+</section>
+
+{% if session.get('newspaper_id') %}
+<div class="zt-divider-ornament"><hr><span>✦</span><hr></div>
+
+<!-- MY NEWSPAPER SECTION -->
+<section class="zt-section">
+    <div class="zt-section-header">
+        <h2 class="zt-section-title">جريدتي — {{ session.newspaper_name }}</h2>
+        <a href="{{ url_for('dashboard') }}" class="zt-btn-solid">إدارة الجريدة</a>
+    </div>
+    <div class="zt-cards-grid">
+        {% for issue in my_issues %}
+        <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-card">
+            <div class="zt-card-img">ZEIN TIMES</div>
+            <div class="zt-card-body">
+                <div class="zt-card-badge">العدد {{ issue.issue_number }}</div>
+                <div class="zt-card-title">{{ issue.title }}</div>
+                <div class="zt-card-meta">
+                    <span>{{ issue.publish_date }}</span>
+                    <span>♥ {{ issue.likes_count }}</span>
+                </div>
+            </div>
+        </a>
+        {% else %}
+        <div style="grid-column:1/-1;text-align:center;padding:40px;">
+            <p style="color:rgba(0,0,0,0.4);font-size:15px;margin-bottom:16px;">لم تنشر أي أعداد بعد.</p>
+            <a href="{{ url_for('issue_create') }}" class="zt-btn-solid">أضف عدد جديد</a>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<script>
+function filterIssues(type, btn) {
+    document.querySelectorAll('.zt-filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    fetch(`/api/issues?sort=${type}`)
+        .then(r => r.json())
+        .then(data => {
+            const grid = document.getElementById('issues-grid');
+            grid.innerHTML = data.map(issue => `
+                <a href="/issue/${issue.id}" class="zt-card">
+                    <div class="zt-card-img">ZEIN TIMES</div>
+                    <div class="zt-card-body">
+                        <div class="zt-card-badge">${issue.newspaper_name}</div>
+                        <div class="zt-card-title">${issue.title}</div>
+                        <div class="zt-card-meta">
+                            <span>${issue.publish_date}</span>
+                            <span class="zt-stars">★★★★☆</span>
+                        </div>
+                    </div>
+                </a>
+            `).join('') || '<p style="color:rgba(0,0,0,0.4);">لا توجد أعداد.</p>';
+        });
+}
+</script>
+{% endblock %}

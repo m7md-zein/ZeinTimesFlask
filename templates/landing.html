@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Zein Times — منصة الجرائد الرقمية{% endblock %}
+
+{% block content %}
+<section class="zt-landing">
+    <div class="zt-landing-date" id="today-date"></div>
+    <h1 class="zt-landing-title">Zein Times</h1>
+    <div class="zt-landing-divider"><hr><span>✦</span><hr></div>
+    <p class="zt-landing-sub">منصة الجرائد الرقمية — أنشئ جريدتك وشاركها مع العالم</p>
+    <div class="zt-landing-btns">
+        <a href="{{ url_for('register') }}" class="zt-btn-solid">ابدأ الآن</a>
+        <a href="{{ url_for('home') }}" class="zt-btn-outline">تصفح الجرائد</a>
+    </div>
+</section>
+
+<script>
+const d = new Date();
+const days = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const months = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+document.getElementById('today-date').textContent = `${days[d.getDay()]}، ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+</script>
+{% endblock %}

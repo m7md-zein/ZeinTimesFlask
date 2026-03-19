@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zein Times{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="zt-header">
+    <div class="zt-header-inner">
+        <a href="{{ url_for('landing') }}" class="zt-logo">
+            <span class="zt-logo-main">Zein Times</span>
+            <span class="zt-logo-sub">Digital Newspaper Platform</span>
+        </a>
+        <nav class="zt-nav">
+            <a href="{{ url_for('home') }}" class="zt-nav-link">الرئيسية</a>
+            {% if session.get('newspaper_id') %}
+                <a href="{{ url_for('dashboard') }}" class="zt-nav-link">جريدتي</a>
+                <a href="{{ url_for('logout') }}" class="zt-btn-outline">خروج</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="zt-btn-outline">دخول</a>
+                <a href="{{ url_for('register') }}" class="zt-btn-solid">إنشاء جريدة</a>
+            {% endif %}
+            <button class="zt-btn-outline" onclick="toggleLang()" id="lang-btn">EN</button>
+        </nav>
+    </div>
+</header>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <div class="zt-flash">
+            {% for msg in messages %}
+                <div class="zt-flash-msg">{{ msg }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<!-- MAIN CONTENT -->
+<main class="zt-main">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- FOOTER -->
+<footer class="zt-footer">
+    <div class="zt-footer-inner">
+        <div class="zt-footer-logo">Zein Times</div>
+        <div class="zt-footer-links">
+            <a href="#" class="zt-footer-link">About</a>
+            <a href="#" class="zt-footer-link">تواصل مع المطور</a>
+        </div>
+    </div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

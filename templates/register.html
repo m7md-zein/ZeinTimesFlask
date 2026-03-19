@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Zein Times — إنشاء جريدة{% endblock %}
+
+{% block content %}
+<div class="zt-auth-page" style="max-width:680px;">
+    <h1 class="zt-auth-title">إنشاء جريدة جديدة</h1>
+    <p class="zt-auth-sub">حسابك هو جريدتك — ابدأ رحلتك الصحفية</p>
+
+    <form method="POST">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="zt-form-group">
+                <label class="zt-form-label">اسمك</label>
+                <input type="text" name="author_name" class="zt-form-input" required>
+            </div>
+            <div class="zt-form-group">
+                <label class="zt-form-label">اسم الجريدة</label>
+                <input type="text" name="name" class="zt-form-input" required>
+            </div>
+        </div>
+
+        <div class="zt-form-group">
+            <label class="zt-form-label">اسم المستخدم</label>
+            <input type="text" name="username" id="username-input" class="zt-form-input"
+                   required autocomplete="off" oninput="checkUsername(this.value)">
+            <div id="username-hint" class="zt-username-hint" style="display:none;"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="zt-form-group">
+                <label class="zt-form-label">الإيميل</label>
+                <input type="email" name="email" class="zt-form-input" required>
+            </div>
+            <div class="zt-form-group">
+                <label class="zt-form-label">رقم الهاتف</label>
+                <input type="tel" name="phone" class="zt-form-input">
+            </div>
+        </div>
+
+        <div class="zt-form-group">
+            <label class="zt-form-label">كلمة المرور</label>
+            <input type="password" name="password" class="zt-form-input" required autocomplete="new-password">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="zt-form-group">
+                <label class="zt-form-label">نوع الجريدة</label>
+                <select name="category" class="zt-form-select">
+                    <option value="علمية">علمية</option>
+                    <option value="أدبية">أدبية</option>
+                    <option value="رياضية">رياضية</option>
+                    <option value="نمط الحياة">نمط الحياة</option>
+                    <option value="أخرى">أخرى</option>
+                </select>
+            </div>
+            <div class="zt-form-group">
+                <label class="zt-form-label">تكرار النشر</label>
+                <select name="frequency" class="zt-form-select">
+                    <option value="يومية">يومية</option>
+                    <option value="أسبوعية">أسبوعية</option>
+                    <option value="شهرية">شهرية</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="zt-form-group">
+            <label class="zt-form-label">وصف الجريدة</label>
+            <textarea name="description" class="zt-form-textarea"></textarea>
+        </div>
+
+        <button type="submit" class="zt-form-submit">إنشاء الجريدة</button>
+    </form>
+
+    <div class="zt-auth-switch">
+        عندك حساب؟ <a href="{{ url_for('login') }}">سجل دخولك</a>
+    </div>
+</div>
+
+<script>
+let checkTimeout;
+function checkUsername(val) {
+    val = val.toLowerCase().replace(/\s/g, '');
+    document.getElementById('username-input').value = val;
+    const hint = document.getElementById('username-hint');
+    if (!val) { hint.style.display = 'none'; return; }
+    if (!/^[a-z0-9_]+$/.test(val)) {
+        hint.style.display = 'block';
+        hint.className = 'zt-username-hint taken';
+        hint.textContent = '❌ أحرف إنجليزية صغيرة وأرقام و _ فقط';
+        return;
+    }
+    clearTimeout(checkTimeout);
+    checkTimeout = setTimeout(() => {
+        fetch(`/check-username?username=${val}`)
+            .then(r => r.json())
+            .then(data => {
+                hint.style.display = 'block';
+                if (data.available) {
+                    hint.className = 'zt-username-hint available';
+                    hint.textContent = '✅ اسم المستخدم متاح';
+                } else {
+                    hint.className = 'zt-username-hint taken';
+                    hint.textContent = '❌ اسم المستخدم موجود بالفعل';
+                }
+            });
+    }, 400);
+}
+</script>
+{% endblock %}
