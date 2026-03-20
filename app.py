@@ -12,6 +12,11 @@ app.secret_key = os.getenv("SECRET_KEY", "zeintimes_secret")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+from database import init_db
+with app.app_context():
+    init_db()
+
+
 STYLES = {
     "كلاسيكي": {"bg":"#f5f0e8","header_bg":"#2c1810","header_color":"#f5f0e8","text_color":"#2c1810","section_bg":"#fff8f0","border":"#8b6914","section_title_color":"#8b6914"},
     "علمي":    {"bg":"#f0f4f8","header_bg":"#1a3a5c","header_color":"#ffffff","text_color":"#1a2a3a","section_bg":"#ffffff","border":"#2980b9","section_title_color":"#1a3a5c"},
