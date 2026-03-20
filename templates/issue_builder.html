@@ -12,9 +12,9 @@
 
         <!-- STEP INDICATOR -->
         <div style="display:flex;gap:0;margin-bottom:32px;border:1px solid rgba(0,0,0,0.1);border-radius:3px;overflow:hidden;">
-            {% for step_name in ['المعلومات الأساسية','الفقرات','المحتوى','الستايل'] %}
+            {% for step_name in ['المعلومات','الفقرات','المحتوى','التخطيط','الستايل'] %}
             <div class="step-indicator" id="step-tab-{{ loop.index }}"
-                style="flex:1;padding:10px;text-align:center;font-size:12px;letter-spacing:1px;
+                style="flex:1;padding:10px;text-align:center;font-size:11px;letter-spacing:1px;
                        background:{% if loop.index == 1 %}rgba(0,0,0,0.85){% else %}transparent{% endif %};
                        color:{% if loop.index == 1 %}white{% else %}rgba(0,0,0,0.4){% endif %};
                        border-left:{% if loop.index > 1 %}1px solid rgba(0,0,0,0.1){% else %}none{% endif %};">
@@ -65,8 +65,134 @@
             </div>
         </div>
 
-        <!-- STEP 4: STYLE -->
+        <!-- STEP 4: LAYOUT -->
         <div class="step" id="step-4" style="display:none;">
+            <p style="font-size:14px;color:rgba(0,0,0,0.5);margin-bottom:24px;">اختر ترتيب الفقرات في العدد</p>
+            <input type="hidden" name="layout_template" id="selected-layout" value="template_1">
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+
+                <!-- T1: كبيرة فوق + اتنين تحت -->
+                <div onclick="selectLayout('template_1',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.85);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">كبيرة + اتنين</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1.5;"></div>
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T2: اتنين x اتنين -->
+                <div onclick="selectLayout('template_2',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">شبكة ٢×٢</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                        </div>
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T3: ثلاثة + واحدة -->
+                <div onclick="selectLayout('template_3',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">ثلاثة + واحدة</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                        </div>
+                        <div style="display:flex;gap:3px;flex:1.5;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T4: كبيرة يسار + اتنين يمين -->
+                <div onclick="selectLayout('template_4',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">كبيرة + اتنين جنبها</div>
+                    <div style="display:flex;gap:3px;height:70px;">
+                        <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:2;"></div>
+                        <div style="display:flex;flex-direction:column;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T5: واحدة فوق + ثلاثة تحت -->
+                <div onclick="selectLayout('template_5',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">واحدة + ثلاثة</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- T6: ثلاثة + كبيرة -->
+                <div onclick="selectLayout('template_6',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">ثلاثة + كبيرة</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1.5;"></div>
+                    </div>
+                </div>
+
+                <!-- T7: اتنين + واحدة -->
+                <div onclick="selectLayout('template_7',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">اتنين + واحدة</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:1;"></div>
+                        </div>
+                        <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                    </div>
+                </div>
+
+                <!-- T8: موزايك -->
+                <div onclick="selectLayout('template_8',this)" class="layout-card" style="border:2px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px;cursor:pointer;">
+                    <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:8px;text-align:center;">موزايك</div>
+                    <div style="display:flex;flex-direction:column;gap:3px;height:70px;">
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:2;"></div>
+                        </div>
+                        <div style="display:flex;gap:3px;flex:1;">
+                            <div style="background:rgba(0,0,0,0.15);border-radius:2px;flex:2;"></div>
+                            <div style="background:rgba(0,0,0,0.1);border-radius:2px;flex:1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="layout-selected-msg" style="padding:10px;background:#d8f3dc;color:#2d6a4f;border-radius:3px;margin-bottom:16px;font-size:14px;">
+                ✅ النموذج المختار: كبيرة + اتنين
+            </div>
+
+            <div style="display:flex;gap:12px;">
+                <button type="button" onclick="goToStep(3)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
+                <button type="button" onclick="goToStep(5)" class="zt-btn-solid" style="flex:2;padding:12px;">التالي ←</button>
+            </div>
+        </div>
+
+        <!-- STEP 5: STYLE -->
+        <div class="step" id="step-5" style="display:none;">
             <p style="font-size:14px;color:rgba(0,0,0,0.5);margin-bottom:24px;">اختر تصميم جريدتك</p>
             <input type="hidden" name="style" id="selected-style" value="">
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;">
@@ -90,7 +216,7 @@
             </div>
             <div id="style-selected-msg" style="display:none;padding:10px;background:#d8f3dc;color:#2d6a4f;border-radius:3px;margin-bottom:16px;font-size:14px;"></div>
             <div style="display:flex;gap:12px;">
-                <button type="button" onclick="goToStep(3)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
+                <button type="button" onclick="goToStep(4)" class="zt-btn-outline" style="flex:1;padding:12px;">→ السابق</button>
                 <button type="submit" class="zt-form-submit" style="flex:2;padding:12px;">توليد الجريدة</button>
             </div>
         </div>
@@ -99,10 +225,19 @@
 </div>
 
 <script>
-let currentStep = 1;
+const layoutNames = {
+    template_1: 'كبيرة + اتنين',
+    template_2: 'شبكة ٢×٢',
+    template_3: 'ثلاثة + واحدة',
+    template_4: 'كبيرة + اتنين جنبها',
+    template_5: 'واحدة + ثلاثة',
+    template_6: 'ثلاثة + كبيرة',
+    template_7: 'اتنين + واحدة',
+    template_8: 'موزايك'
+};
 
 function updateStepIndicators(step) {
-    for (let i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 5; i++) {
         const tab = document.getElementById(`step-tab-${i}`);
         if (i === step) {
             tab.style.background = 'rgba(0,0,0,0.85)';
@@ -120,7 +255,6 @@ function goToStep(step) {
     if (step === 3) buildSectionContent();
     document.getElementById(`step-${step}`).style.display = 'block';
     updateStepIndicators(step);
-    currentStep = step;
     window.scrollTo(0, 0);
 }
 
@@ -163,6 +297,15 @@ function buildSectionContent() {
                 </div>
             </div>`;
     }
+}
+
+function selectLayout(name, el) {
+    document.querySelectorAll('.layout-card').forEach(c => {
+        c.style.border = '2px solid rgba(0,0,0,0.1)';
+    });
+    el.style.border = '2px solid rgba(0,0,0,0.85)';
+    document.getElementById('selected-layout').value = name;
+    document.getElementById('layout-selected-msg').textContent = `✅ النموذج المختار: ${layoutNames[name]}`;
 }
 
 function selectStyle(name, el) {

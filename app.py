@@ -307,13 +307,14 @@ def issue_create():
         issue_number = request.form.get("issue_number")
         publish_date = request.form.get("publish_date")
         style = request.form.get("style", "كلاسيكي")
+        layout_template = request.form.get("layout_template", "template_1")
         sections_count = int(request.form.get("sections_count", 3))
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO issues (newspaper_id, title, issue_number, publish_date, style, status)
-            VALUES (%s, %s, %s, %s, %s, 'draft')
-        """, (session["newspaper_id"], title, issue_number, publish_date, style))
+            INSERT INTO issues (newspaper_id, title, issue_number, publish_date, style, layout_template, status)
+            VALUES (%s, %s, %s, %s, %s, %s, 'draft')
+        """, (session["newspaper_id"], title, issue_number, publish_date, style, layout_template))
         issue_id = cursor.lastrowid
         for i in range(sections_count):
             sec_title = request.form.get(f"section_title_{i}", f"فقرة {i+1}")
