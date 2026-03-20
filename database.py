@@ -22,7 +22,7 @@ def init_db():
     )
     cursor = conn.cursor()
     cursor.execute("CREATE DATABASE IF NOT EXISTS zein_times_v2")
-    cursor.execute("USE zein_times_v2")
+    cursor.execute(f"USE {os.getenv('DB_NAME')}")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS newspapers (
