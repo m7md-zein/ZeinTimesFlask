@@ -23,9 +23,11 @@ cloudinary.config(
 def upload_image(file_obj):
     try:
         result = cloudinary.uploader.upload(file_obj, folder="zeintimes")
-        return result.get("secure_url")
+        url = result.get("secure_url")
+        print(f"Cloudinary upload success: {url}")
+        return url
     except Exception as e:
-        print(f"Cloudinary error: {e}")
+        print(f"Cloudinary upload FAILED: {e}")
         return None
 
 def get_image_url(path):
