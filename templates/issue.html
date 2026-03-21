@@ -4,19 +4,14 @@
 {% block content %}
 
 <!-- ISSUE HEADER -->
-<div style="position:relative;background:{{ style.header_bg }};color:{{ style.header_color }};padding:48px 32px;text-align:center;overflow:hidden;">
-    {% if issue.cover_image %}
-    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:url('{{ url_for('uploaded_file', filename=issue.cover_image) }}') center/cover no-repeat;opacity:0.6;"></div>
-    {% endif %}
-    <div style="position:relative;z-index:1;">
-        <div style="font-size:11px;letter-spacing:5px;opacity:0.6;text-transform:uppercase;margin-bottom:8px;">{{ issue.newspaper_name }}</div>
-        <h1 style="font-family:'Playfair Display',serif;font-size:42px;font-weight:700;letter-spacing:4px;margin-bottom:10px;">{{ issue.title }}</h1>
-        <p style="font-size:16px;opacity:0.75;letter-spacing:2px;">العدد {{ issue.issue_number }} — {{ issue.publish_date }}</p>
-        <div style="display:flex;align-items:center;gap:16px;justify-content:center;margin-top:20px;">
-            <div style="height:1px;width:80px;background:currentColor;opacity:0.3;"></div>
-            <span style="opacity:0.4;font-size:18px;">✦</span>
-            <div style="height:1px;width:80px;background:currentColor;opacity:0.3;"></div>
-        </div>
+<div style="background:{{ style.header_bg }};color:{{ style.header_color }};padding:48px 32px;text-align:center;">
+    <div style="font-size:11px;letter-spacing:5px;opacity:0.6;text-transform:uppercase;margin-bottom:8px;">{{ issue.newspaper_name }}</div>
+    <h1 style="font-family:'Playfair Display',serif;font-size:42px;font-weight:700;letter-spacing:4px;margin-bottom:10px;">{{ issue.title }}</h1>
+    <p style="font-size:16px;opacity:0.75;letter-spacing:2px;">العدد {{ issue.issue_number }} — {{ issue.publish_date }}</p>
+    <div style="display:flex;align-items:center;gap:16px;justify-content:center;margin-top:20px;">
+        <div style="height:1px;width:80px;background:currentColor;opacity:0.3;"></div>
+        <span style="opacity:0.4;font-size:18px;">✦</span>
+        <div style="height:1px;width:80px;background:currentColor;opacity:0.3;"></div>
     </div>
 </div>
 

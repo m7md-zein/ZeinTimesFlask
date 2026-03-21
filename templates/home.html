@@ -20,7 +20,7 @@
         <a href="{{ url_for('newspaper_view', username=paper.username) }}" class="zt-card">
             <div class="zt-card-img">
                 {% if paper.cover_image %}
-                    <img src="{{ url_for('uploaded_file', filename=paper.cover_image) }}" alt="{{ paper.name }}">
+                    <img src="{{ paper.cover_image }}" alt="{{ paper.name }}">
                 {% else %}
                     ZEIN TIMES
                 {% endif %}
@@ -60,7 +60,7 @@
         <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-card">
             <div class="zt-card-img">
                 {% if issue.cover_image %}
-                    <img src="{{ url_for('uploaded_file', filename=issue.cover_image) }}" alt="{{ issue.title }}">
+                    <img src="{{ issue.cover_image }}" alt="{{ issue.title }}">
                 {% else %}
                     ZEIN TIMES
                 {% endif %}

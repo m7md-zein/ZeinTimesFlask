@@ -2,7 +2,7 @@ from database import get_connection
 conn = get_connection()
 cursor = conn.cursor()
 try:
-    cursor.execute("ALTER TABLE newspapers ADD COLUMN cover_image VARCHAR(500)")
+    cursor.execute("ALTER TABLE issues ADD COLUMN layout_template VARCHAR(50) DEFAULT 'template_1'")
     conn.commit()
     print("Done!")
 except Exception as e:
