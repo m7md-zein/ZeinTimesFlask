@@ -5,10 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Zein Times{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=EB+Garamond:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=EB+Garamond:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
+<!-- OLIVE BRANCHES - موزعة في كل الصفحة -->
+
+<!-- يمين علوي - أخضر ثقيل -->
+<div class="zt-bg-olive zt-olive-right-top" aria-hidden="true">
+    <svg viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#2d5a35">
+            <path d="M250 700 Q230 580 210 460 Q190 340 200 200 Q205 120 215 40" stroke="#2d5a35" stroke-width="10" fill="none" opacity="0.9"/>
+            <ellipse cx="185" cy="420" rx="55" ry="26" transform="rotate(-42 185 420)"/>
+            <ellipse cx="162" cy="345" rx="50" ry="23" transform="rotate(-50 162 345)"/>
+            <ellipse cx="178" cy="275" rx="52" ry="25" transform="rotate(-38 178 275)"/>
+            <ellipse cx="160" cy="210" rx="48" ry="22" transform="rotate(-45 160 210)"/>
+            <ellipse cx="175" cy="150" rx="50" ry="23" transform="rotate(-40 175 150)"/>
+            <ellipse cx="163" cy="95" rx="44" ry="20" transform="rotate(-43 163 95)"/>
+            <ellipse cx="225" cy="460" rx="54" ry="25" transform="rotate(38 225 460)"/>
+            <ellipse cx="240" cy="390" rx="51" ry="23" transform="rotate(46 240 390)"/>
+            <ellipse cx="228" cy="320" rx="53" ry="24" transform="rotate(40 228 320)"/>
+            <ellipse cx="242" cy="255" rx="49" ry="22" transform="rotate(47 242 255)"/>
+            <ellipse cx="230" cy="190" rx="51" ry="23" transform="rotate(42 230 190)"/>
+            <ellipse cx="245" cy="130" rx="47" ry="21" transform="rotate(35 245 130)"/>
+            <!-- زيتون -->
+            <ellipse cx="178" cy="395" rx="13" ry="18" transform="rotate(-8 178 395)"/>
+            <ellipse cx="232" cy="360" rx="13" ry="18" transform="rotate(8 232 360)"/>
+            <ellipse cx="168" cy="265" rx="12" ry="16"/>
+            <ellipse cx="238" cy="225" rx="12" ry="16"/>
+            <ellipse cx="172" cy="145" rx="11" ry="15"/>
+            <ellipse cx="240" cy="115" rx="11" ry="15"/>
+            <!-- فروع ثانوية -->
+            <path d="M205 500 Q155 475 115 445" stroke="#2d5a35" stroke-width="7" fill="none" opacity="0.8"/>
+            <ellipse cx="122" cy="452" rx="44" ry="20" transform="rotate(-62 122 452)"/>
+            <ellipse cx="100" cy="436" rx="40" ry="18" transform="rotate(-58 100 436)"/>
+            <path d="M222 320 Q278 292 318 262" stroke="#2d5a35" stroke-width="7" fill="none" opacity="0.8"/>
+            <ellipse cx="310" cy="270" rx="44" ry="20" transform="rotate(57 310 270)"/>
+            <ellipse cx="332" cy="252" rx="40" ry="18" transform="rotate(62 332 252)"/>
+        </g>
+    </svg>
+</div>
+
+<!-- يسار سفلي - بني ثقيل -->
+<div class="zt-bg-olive zt-olive-left-bottom" aria-hidden="true">
+    <svg viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#6b4226">
+            <path d="M250 0 Q268 120 285 240 Q300 360 292 490 Q288 570 278 660" stroke="#6b4226" stroke-width="10" fill="none" opacity="0.9"/>
+            <ellipse cx="310" cy="280" rx="55" ry="26" transform="rotate(42 310 280)"/>
+            <ellipse cx="330" cy="355" rx="50" ry="23" transform="rotate(50 330 355)"/>
+            <ellipse cx="315" cy="425" rx="52" ry="25" transform="rotate(38 315 425)"/>
+            <ellipse cx="332" cy="490" rx="48" ry="22" transform="rotate(45 332 490)"/>
+            <ellipse cx="318" cy="550" rx="50" ry="23" transform="rotate(40 318 550)"/>
+            <ellipse cx="270" cy="260" rx="54" ry="25" transform="rotate(-38 270 260)"/>
+            <ellipse cx="255" cy="335" rx="51" ry="23" transform="rotate(-46 255 335)"/>
+            <ellipse cx="268" cy="405" rx="53" ry="24" transform="rotate(-40 268 405)"/>
+            <ellipse cx="254" cy="465" rx="49" ry="22" transform="rotate(-47 254 465)"/>
+            <ellipse cx="267" cy="525" rx="51" ry="23" transform="rotate(-42 267 525)"/>
+            <!-- زيتون -->
+            <ellipse cx="316" cy="305" rx="13" ry="18" transform="rotate(8 316 305)"/>
+            <ellipse cx="262" cy="340" rx="13" ry="18" transform="rotate(-8 262 340)"/>
+            <ellipse cx="325" cy="445" rx="12" ry="16"/>
+            <ellipse cx="258" cy="480" rx="12" ry="16"/>
+            <!-- فروع ثانوية -->
+            <path d="M285 180 Q335 155 375 128" stroke="#6b4226" stroke-width="7" fill="none" opacity="0.8"/>
+            <ellipse cx="367" cy="136" rx="44" ry="20" transform="rotate(60 367 136)"/>
+            <ellipse cx="388" cy="118" rx="40" ry="18" transform="rotate(65 388 118)"/>
+        </g>
+    </svg>
+</div>
+
+<!-- وسط خلفية - بني فاتح شفاف -->
+<div class="zt-bg-olive zt-olive-center" aria-hidden="true">
+    <svg viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
+        <g fill="#8b5e3c" opacity="0.35">
+            <path d="M150 500 Q138 400 128 300 Q118 200 125 100 Q128 55 132 20" stroke="#8b5e3c" stroke-width="7" fill="none"/>
+            <ellipse cx="112" cy="280" rx="42" ry="19" transform="rotate(-40 112 280)"/>
+            <ellipse cx="100" cy="220" rx="38" ry="17" transform="rotate(-48 100 220)"/>
+            <ellipse cx="110" cy="165" rx="40" ry="18" transform="rotate(-36 110 165)"/>
+            <ellipse cx="142" cy="300" rx="41" ry="19" transform="rotate(36 142 300)"/>
+            <ellipse cx="152" cy="240" rx="39" ry="18" transform="rotate(44 152 240)"/>
+            <ellipse cx="144" cy="180" rx="41" ry="19" transform="rotate(38 144 180)"/>
+            <ellipse cx="104" cy="248" rx="10" ry="14"/>
+            <ellipse cx="148" cy="218" rx="10" ry="14"/>
+        </g>
+    </svg>
+</div>
 
 <!-- HEADER -->
 <header class="zt-header">
@@ -26,12 +108,12 @@
                 <a href="{{ url_for('login') }}" class="zt-btn-outline">دخول</a>
                 <a href="{{ url_for('register') }}" class="zt-btn-solid">إنشاء جريدة</a>
             {% endif %}
+            <button class="zt-dark-toggle" onclick="toggleDark()" id="dark-btn" title="Dark Mode">🌙</button>
             <button class="zt-btn-outline" onclick="toggleLang()" id="lang-btn">EN</button>
         </nav>
     </div>
 </header>
 
-<!-- FLASH MESSAGES -->
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         <div class="zt-flash">
@@ -42,12 +124,10 @@
     {% endif %}
 {% endwith %}
 
-<!-- MAIN CONTENT -->
 <main class="zt-main">
     {% block content %}{% endblock %}
 </main>
 
-<!-- FOOTER -->
 <footer class="zt-footer">
     <div class="zt-footer-inner">
         <div class="zt-footer-logo">Zein Times</div>
@@ -59,5 +139,27 @@
 </footer>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+function toggleDark() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('zt-theme', isDark ? 'light' : 'dark');
+    document.getElementById('dark-btn').textContent = isDark ? '🌙' : '☀️';
+}
+(function() {
+    const saved = localStorage.getItem('zt-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+    if (saved === 'dark') {
+        document.addEventListener('DOMContentLoaded', function() {
+            const btn = document.getElementById('dark-btn');
+            if (btn) btn.textContent = '☀️';
+        });
+    }
+})();
+function toggleLang() {
+    const btn = document.getElementById('lang-btn');
+    btn.textContent = btn.textContent === 'EN' ? 'ع' : 'EN';
+}
+</script>
 </body>
 </html>
