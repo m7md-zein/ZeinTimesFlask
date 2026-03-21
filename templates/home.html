@@ -3,13 +3,11 @@
 
 {% block content %}
 
-<!-- QUOTE SECTION -->
 <div class="zt-quote-section">
     <div class="zt-quote-text">"{{ quote.text_ar }}"</div>
     <div class="zt-quote-author">— {{ quote.author }}</div>
 </div>
 
-<!-- POPULAR NEWSPAPERS -->
 <section class="zt-section">
     <div class="zt-section-header">
         <h2 class="zt-section-title">أشهر الجرائد</h2>
@@ -20,7 +18,7 @@
         <a href="{{ url_for('newspaper_view', username=paper.username) }}" class="zt-card">
             <div class="zt-card-img">
                 {% if paper.cover_image %}
-                    <img src="{{ url_for('uploaded_file', filename=paper.cover_image) }}" alt="{{ paper.name }}">
+                    <img src="{{ get_image_url(paper.cover_image) }}" alt="{{ paper.name }}">
                 {% else %}
                     ZEIN TIMES
                 {% endif %}
@@ -30,11 +28,7 @@
                 <div class="zt-card-title">{{ paper.name }}</div>
                 <div class="zt-card-meta">
                     <span>@{{ paper.username }}</span>
-                    <span class="zt-stars">
-                        {% for i in range(5) %}
-                            {% if i < paper.rating|int %}★{% else %}☆{% endif %}
-                        {% endfor %}
-                    </span>
+                    <span class="zt-stars">{% for i in range(5) %}{% if i < paper.rating|int %}★{% else %}☆{% endif %}{% endfor %}</span>
                 </div>
             </div>
         </a>
@@ -46,7 +40,6 @@
 
 <div class="zt-divider-ornament"><hr><span>✦</span><hr></div>
 
-<!-- ISSUES SECTION -->
 <section class="zt-section">
     <div class="zt-section-header">
         <h2 class="zt-section-title">الأعداد</h2>
@@ -60,7 +53,7 @@
         <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-card">
             <div class="zt-card-img">
                 {% if issue.cover_image %}
-                    <img src="{{ url_for('uploaded_file', filename=issue.cover_image) }}" alt="{{ issue.title }}">
+                    <img src="{{ get_image_url(issue.cover_image) }}" alt="{{ issue.title }}">
                 {% else %}
                     ZEIN TIMES
                 {% endif %}
@@ -70,11 +63,7 @@
                 <div class="zt-card-title">{{ issue.title }}</div>
                 <div class="zt-card-meta">
                     <span>{{ issue.publish_date }}</span>
-                    <span class="zt-stars">
-                        {% for i in range(5) %}
-                            {% if i < issue.rating|int %}★{% else %}☆{% endif %}
-                        {% endfor %}
-                    </span>
+                    <span class="zt-stars">{% for i in range(5) %}{% if i < issue.rating|int %}★{% else %}☆{% endif %}{% endfor %}</span>
                 </div>
             </div>
         </a>
@@ -86,8 +75,6 @@
 
 {% if session.get('newspaper_id') %}
 <div class="zt-divider-ornament"><hr><span>✦</span><hr></div>
-
-<!-- MY NEWSPAPER SECTION -->
 <section class="zt-section">
     <div class="zt-section-header">
         <h2 class="zt-section-title">جريدتي — {{ session.newspaper_name }}</h2>
@@ -96,7 +83,13 @@
     <div class="zt-cards-grid">
         {% for issue in my_issues %}
         <a href="{{ url_for('issue_view', issue_id=issue.id) }}" class="zt-card">
-            <div class="zt-card-img">ZEIN TIMES</div>
+            <div class="zt-card-img">
+                {% if issue.cover_image %}
+                    <img src="{{ get_image_url(issue.cover_image) }}" alt="{{ issue.title }}">
+                {% else %}
+                    ZEIN TIMES
+                {% endif %}
+            </div>
             <div class="zt-card-body">
                 <div class="zt-card-badge">العدد {{ issue.issue_number }}</div>
                 <div class="zt-card-title">{{ issue.title }}</div>
@@ -126,14 +119,13 @@ function filterIssues(type, btn) {
             const grid = document.getElementById('issues-grid');
             grid.innerHTML = data.map(issue => `
                 <a href="/issue/${issue.id}" class="zt-card">
-                    <div class="zt-card-img">ZEIN TIMES</div>
+                    <div class="zt-card-img">
+                        ${issue.cover_image ? `<img src="${issue.cover_image}" style="width:100%;height:100%;object-fit:cover;">` : 'ZEIN TIMES'}
+                    </div>
                     <div class="zt-card-body">
                         <div class="zt-card-badge">${issue.newspaper_name}</div>
                         <div class="zt-card-title">${issue.title}</div>
-                        <div class="zt-card-meta">
-                            <span>${issue.publish_date}</span>
-                            <span class="zt-stars">★★★★☆</span>
-                        </div>
+                        <div class="zt-card-meta"><span>${issue.publish_date}</span><span class="zt-stars">★★★★☆</span></div>
                     </div>
                 </a>
             `).join('') || '<p style="color:rgba(0,0,0,0.4);">لا توجد أعداد.</p>';

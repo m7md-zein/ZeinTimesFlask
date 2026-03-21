@@ -3,10 +3,9 @@
 
 {% block content %}
 
-<!-- ISSUE HEADER -->
 <div style="position:relative;background:{{ style.header_bg }};color:{{ style.header_color }};padding:48px 32px;text-align:center;overflow:hidden;">
     {% if issue.cover_image %}
-    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:url('{{ url_for('uploaded_file', filename=issue.cover_image) }}') center/cover no-repeat;opacity:0.3;"></div>
+    <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:url('{{ get_image_url(issue.cover_image) }}') center/cover no-repeat;opacity:0.5;"></div>
     {% endif %}
     <div style="position:relative;z-index:1;">
         <div style="font-size:11px;letter-spacing:5px;opacity:0.6;text-transform:uppercase;margin-bottom:8px;">{{ issue.newspaper_name }}</div>
@@ -20,11 +19,9 @@
     </div>
 </div>
 
-<!-- ACTION BAR -->
 <div style="background:{{ style.bg }};border-bottom:1px solid rgba(0,0,0,0.1);padding:12px 32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
     <div style="display:flex;align-items:center;gap:16px;">
         <a href="{{ url_for('newspaper_view', username=issue.username) }}" style="font-size:13px;color:rgba(0,0,0,0.5);text-decoration:none;letter-spacing:1px;">← {{ issue.newspaper_name }}</a>
-        <!-- LIKE BUTTON -->
         {% if session.get('newspaper_id') %}
         <form method="POST" action="{{ url_for('like_issue', issue_id=issue.id) }}" style="display:inline;">
             <button type="submit" style="background:none;border:1px solid rgba(0,0,0,0.15);border-radius:3px;padding:6px 14px;cursor:pointer;font-family:'EB Garamond',serif;font-size:14px;color:{% if is_liked %}#c8a951{% else %}rgba(0,0,0,0.5){% endif %};">
@@ -50,44 +47,30 @@
     </div>
 </div>
 
-<!-- ISSUE CONTENT -->
 <div style="background:{{ style.bg }};min-height:60vh;padding:40px 32px;">
     <div style="max-width:900px;margin:0 auto;">
-
         {% set t = issue.layout_template or 'template_1' %}
 
         {% macro section_block(s) %}
         <div style="background:{{ style.section_bg }};border:1px solid {{ style.border }};border-radius:8px;padding:24px;height:100%;">
-            <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:{{ style.section_title_color }};border-bottom:2px solid {{ style.border }};padding-bottom:10px;margin-bottom:16px;">
-                {{ s.title }}
-            </h2>
+            <h2 style="font-family:'Playfair Display',serif;font-size:20px;color:{{ style.section_title_color }};border-bottom:2px solid {{ style.border }};padding-bottom:10px;margin-bottom:16px;">{{ s.title }}</h2>
             {% if s.image_path %}
-            <img src="{{ url_for('uploaded_file', filename=s.image_path.split('/')[-1]) }}"
-                 style="width:100%;max-height:280px;object-fit:cover;border-radius:4px;margin-bottom:16px;">
+            <img src="{{ get_image_url(s.image_path) }}" style="width:100%;max-height:280px;object-fit:cover;border-radius:4px;margin-bottom:16px;">
             {% endif %}
-            <p style="font-family:'EB Garamond',serif;font-size:16px;color:{{ style.text_color }};line-height:1.9;">
-                {{ s.body_text }}
-            </p>
+            <p style="font-family:'EB Garamond',serif;font-size:16px;color:{{ style.text_color }};line-height:1.9;">{{ s.body_text }}</p>
         </div>
         {% endmacro %}
 
         {% if t == 'template_1' %}
-        <!-- كبيرة فوق + اتنين تحت -->
         <div style="margin-bottom:20px;">{{ section_block(sections[0]) if sections|length > 0 }}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
             <div>{{ section_block(sections[2]) if sections|length > 2 }}</div>
         </div>
         {% for s in sections[3:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_2' %}
-        <!-- شبكة 2x2 -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
-            {% for s in sections %}<div>{{ section_block(s) }}</div>{% endfor %}
-        </div>
-
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">{% for s in sections %}<div>{{ section_block(s) }}</div>{% endfor %}</div>
         {% elif t == 'template_3' %}
-        <!-- ثلاثة فوق + واحدة تحت -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
             <div>{{ section_block(sections[0]) if sections|length > 0 }}</div>
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
@@ -95,9 +78,7 @@
         </div>
         {% if sections|length > 3 %}<div>{{ section_block(sections[3]) }}</div>{% endif %}
         {% for s in sections[4:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_4' %}
-        <!-- كبيرة يسار + اتنين يمين -->
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;">
             <div>{{ section_block(sections[0]) if sections|length > 0 }}</div>
             <div style="display:flex;flex-direction:column;gap:20px;">
@@ -106,9 +87,7 @@
             </div>
         </div>
         {% for s in sections[3:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_5' %}
-        <!-- واحدة فوق + ثلاثة تحت -->
         <div style="margin-bottom:20px;">{{ section_block(sections[0]) if sections|length > 0 }}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
@@ -116,9 +95,7 @@
             <div>{{ section_block(sections[3]) if sections|length > 3 }}</div>
         </div>
         {% for s in sections[4:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_6' %}
-        <!-- ثلاثة فوق + كبيرة تحت -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;">
             <div>{{ section_block(sections[0]) if sections|length > 0 }}</div>
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
@@ -126,18 +103,14 @@
         </div>
         {% if sections|length > 3 %}<div>{{ section_block(sections[3]) }}</div>{% endif %}
         {% for s in sections[4:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_7' %}
-        <!-- اتنين فوق + واحدة تحت -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
             <div>{{ section_block(sections[0]) if sections|length > 0 }}</div>
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
         </div>
         {% if sections|length > 2 %}<div>{{ section_block(sections[2]) }}</div>{% endif %}
         {% for s in sections[3:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% elif t == 'template_8' %}
-        <!-- موزايك -->
         <div style="display:grid;grid-template-columns:1fr 2fr;gap:20px;margin-bottom:20px;">
             <div>{{ section_block(sections[0]) if sections|length > 0 }}</div>
             <div>{{ section_block(sections[1]) if sections|length > 1 }}</div>
@@ -147,16 +120,12 @@
             <div>{{ section_block(sections[3]) if sections|length > 3 }}</div>
         </div>
         {% for s in sections[4:] %}<div style="margin-top:20px;">{{ section_block(s) }}</div>{% endfor %}
-
         {% else %}
-        <!-- default: كل الفقرات تحت بعض -->
         {% for s in sections %}<div style="margin-bottom:20px;">{{ section_block(s) }}</div>{% endfor %}
         {% endif %}
-
     </div>
 </div>
 
-<!-- FOOTER ORNAMENT -->
 <div style="background:{{ style.bg }};padding:20px 32px;text-align:center;border-top:1px solid rgba(0,0,0,0.08);">
     <span style="font-size:13px;color:{{ style.section_title_color }};letter-spacing:3px;opacity:0.6;">Zein Times — @{{ issue.username }}</span>
 </div>

@@ -4,6 +4,8 @@ from database import get_connection
 import os
 from datetime import date
 from werkzeug.utils import secure_filename
+import cloudinary
+import cloudinary.uploader
 
 load_dotenv()
 
@@ -12,10 +14,32 @@ app.secret_key = os.getenv("SECRET_KEY", "zeintimes_secret")
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME"),
+    api_key=os.getenv("CLOUDINARY_API_KEY"),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET")
+)
+
+def upload_image(file_obj):
+    try:
+        result = cloudinary.uploader.upload(file_obj, folder="zeintimes")
+        return result.get("secure_url")
+    except Exception as e:
+        print(f"Cloudinary error: {e}")
+        return None
+
+def get_image_url(path):
+    if not path:
+        return None
+    if path.startswith("http"):
+        return path
+    return f"/uploads/{path}"
+
 from database import init_db
 with app.app_context():
     init_db()
 
+app.jinja_env.globals["get_image_url"] = get_image_url
 
 STYLES = {
     "كلاسيكي": {"bg":"#f5f0e8","header_bg":"#2c1810","header_color":"#f5f0e8","text_color":"#2c1810","section_bg":"#fff8f0","border":"#8b6914","section_title_color":"#8b6914"},
@@ -200,6 +224,7 @@ def api_issues():
     for i in issues:
         if i.get("publish_date"): i["publish_date"] = str(i["publish_date"])
         if i.get("created_at"): i["created_at"] = str(i["created_at"])
+        if i.get("cover_image"): i["cover_image"] = get_image_url(i["cover_image"])
     return jsonify(issues)
 
 @app.route("/login", methods=["GET", "POST"])
@@ -289,13 +314,14 @@ def dashboard_update():
         return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
-
-    cover_image_path = None
     cover_file = request.files.get("cover_image")
     if cover_file and cover_file.filename:
-        filename = secure_filename(f"newspaper_{session['newspaper_id']}_{cover_file.filename}")
-        cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
-        cover_image_path = filename
+        cover_image_path = upload_image(cover_file)
+        if not cover_image_path:
+            filename = secure_filename(f"newspaper_{session['newspaper_id']}_{cover_file.filename}")
+            cover_file.seek(0)
+            cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
+            cover_image_path = filename
         cursor.execute("""
             UPDATE newspapers SET description=%s, category=%s, frequency=%s, cover_image=%s WHERE id=%s
         """, (request.form.get("description"), request.form.get("category"),
@@ -305,7 +331,6 @@ def dashboard_update():
             UPDATE newspapers SET description=%s, category=%s, frequency=%s WHERE id=%s
         """, (request.form.get("description"), request.form.get("category"),
               request.form.get("frequency"), session["newspaper_id"]))
-
     conn.commit()
     cursor.close()
     conn.close()
@@ -322,14 +347,15 @@ def issue_create():
         publish_date = request.form.get("publish_date")
         style = request.form.get("style", "كلاسيكي")
         layout_template = request.form.get("layout_template", "template_1")
-
         cover_image_path = None
         cover_file = request.files.get("cover_image")
         if cover_file and cover_file.filename:
-            filename = secure_filename(f"cover_{cover_file.filename}")
-            cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
-            cover_image_path = filename
-
+            cover_image_path = upload_image(cover_file)
+            if not cover_image_path:
+                filename = secure_filename(f"cover_{cover_file.filename}")
+                cover_file.seek(0)
+                cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
+                cover_image_path = filename
         sections_count = int(request.form.get("sections_count", 3))
         conn = get_connection()
         cursor = conn.cursor()
@@ -344,9 +370,12 @@ def issue_create():
             image_path = None
             img_file = request.files.get(f"section_image_{i}")
             if img_file and img_file.filename:
-                filename = secure_filename(f"{issue_id}_{i}_{img_file.filename}")
-                img_file.save(os.path.join(UPLOAD_FOLDER, filename))
-                image_path = os.path.join(UPLOAD_FOLDER, filename)
+                image_path = upload_image(img_file)
+                if not image_path:
+                    filename = secure_filename(f"{issue_id}_{i}_{img_file.filename}")
+                    img_file.seek(0)
+                    img_file.save(os.path.join(UPLOAD_FOLDER, filename))
+                    image_path = filename
             cursor.execute("""
                 INSERT INTO sections (issue_id, title, body_text, image_path, section_order)
                 VALUES (%s, %s, %s, %s, %s)
