@@ -289,9 +289,23 @@ def dashboard_update():
         return redirect(url_for("login"))
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("UPDATE newspapers SET description=%s, category=%s, frequency=%s WHERE id=%s",
-        (request.form.get("description"), request.form.get("category"),
-         request.form.get("frequency"), session["newspaper_id"]))
+
+    cover_image_path = None
+    cover_file = request.files.get("cover_image")
+    if cover_file and cover_file.filename:
+        filename = secure_filename(f"newspaper_{session['newspaper_id']}_{cover_file.filename}")
+        cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
+        cover_image_path = filename
+        cursor.execute("""
+            UPDATE newspapers SET description=%s, category=%s, frequency=%s, cover_image=%s WHERE id=%s
+        """, (request.form.get("description"), request.form.get("category"),
+              request.form.get("frequency"), cover_image_path, session["newspaper_id"]))
+    else:
+        cursor.execute("""
+            UPDATE newspapers SET description=%s, category=%s, frequency=%s WHERE id=%s
+        """, (request.form.get("description"), request.form.get("category"),
+              request.form.get("frequency"), session["newspaper_id"]))
+
     conn.commit()
     cursor.close()
     conn.close()
@@ -308,13 +322,21 @@ def issue_create():
         publish_date = request.form.get("publish_date")
         style = request.form.get("style", "كلاسيكي")
         layout_template = request.form.get("layout_template", "template_1")
+
+        cover_image_path = None
+        cover_file = request.files.get("cover_image")
+        if cover_file and cover_file.filename:
+            filename = secure_filename(f"cover_{cover_file.filename}")
+            cover_file.save(os.path.join(UPLOAD_FOLDER, filename))
+            cover_image_path = filename
+
         sections_count = int(request.form.get("sections_count", 3))
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO issues (newspaper_id, title, issue_number, publish_date, style, layout_template, status)
-            VALUES (%s, %s, %s, %s, %s, %s, 'draft')
-        """, (session["newspaper_id"], title, issue_number, publish_date, style, layout_template))
+            INSERT INTO issues (newspaper_id, title, issue_number, publish_date, style, layout_template, cover_image, status)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, 'draft')
+        """, (session["newspaper_id"], title, issue_number, publish_date, style, layout_template, cover_image_path))
         issue_id = cursor.lastrowid
         for i in range(sections_count):
             sec_title = request.form.get(f"section_title_{i}", f"فقرة {i+1}")
